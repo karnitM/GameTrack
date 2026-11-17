@@ -9,7 +9,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun GameLibraryScreen() {
+fun GameLibraryScreen(
+    onAddGame: () -> Unit
+) {
     var searchText by remember { mutableStateOf("") }
 
     // Temporary games until Room database is added
@@ -42,6 +44,15 @@ fun GameLibraryScreen() {
             modifier = Modifier.fillMaxWidth(),
             singleLine = true
         )
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        Button(
+            onClick = onAddGame,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text("Add Game")
+        }
 
         Spacer(modifier = Modifier.height(16.dp))
 
