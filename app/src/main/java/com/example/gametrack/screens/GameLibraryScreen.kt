@@ -14,7 +14,8 @@ import androidx.compose.foundation.clickable
 fun GameLibraryScreen(
     games: List<Game>,
     onAddGame: () -> Unit,
-    onGameClick: (Game) -> Unit
+    onGameClick: (Game) -> Unit,
+    onStatistics: () -> Unit
 ) {
     var searchText by remember { mutableStateOf("") }
 
@@ -50,6 +51,16 @@ fun GameLibraryScreen(
         ) {
             Text("Add Game")
         }
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        OutlinedButton(
+            onClick = onStatistics,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text("View Statistics")
+        }
+
 
         Spacer(modifier = Modifier.height(16.dp))
 

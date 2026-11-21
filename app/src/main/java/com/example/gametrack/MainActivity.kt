@@ -18,6 +18,7 @@ import com.example.gametrack.screens.GameLibraryScreen
 import com.example.gametrack.ui.theme.GameTrackTheme
 import com.example.gametrack.viewmodel.GameViewModel
 import com.example.gametrack.screens.EditGameScreen
+import com.example.gametrack.screens.StatisticsScreen
 
 class MainActivity : ComponentActivity() {
 
@@ -60,6 +61,9 @@ class MainActivity : ComponentActivity() {
                             onGameClick = { game ->
                                 selectedGame = game
                                 currentScreen = "details"
+                            },
+                            onStatistics = {
+                                currentScreen = "statistics"
                             }
                         )
                     }
@@ -115,6 +119,14 @@ class MainActivity : ComponentActivity() {
                                 }
                             )
                         }
+                    }
+                    "statistics" -> {
+                        StatisticsScreen(
+                            games = games,
+                            onBack = {
+                                currentScreen = "library"
+                            }
+                        )
                     }
                 }
             }
