@@ -8,11 +8,13 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.example.gametrack.data.Game
+import androidx.compose.foundation.clickable
 
 @Composable
 fun GameLibraryScreen(
     games: List<Game>,
-    onAddGame: () -> Unit
+    onAddGame: () -> Unit,
+    onGameClick: (Game) -> Unit
 ) {
     var searchText by remember { mutableStateOf("") }
 
@@ -68,7 +70,11 @@ fun GameLibraryScreen(
                     key = { it.gameID }
                 ) { game ->
                     Card(
-                        modifier = Modifier.fillMaxWidth()
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable {
+                                onGameClick(game)
+                            }
                     ) {
                         Column(
                             modifier = Modifier.padding(16.dp)
