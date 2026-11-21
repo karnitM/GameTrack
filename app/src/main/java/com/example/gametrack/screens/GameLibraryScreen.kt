@@ -7,22 +7,17 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.example.gametrack.data.Game
 
 @Composable
 fun GameLibraryScreen(
+    games: List<Game>,
     onAddGame: () -> Unit
 ) {
     var searchText by remember { mutableStateOf("") }
 
-    // Temporary games until Room database is added
-    val games = listOf(
-        "Borderlands 4" to "Currently Playing",
-        "Fallout: New Vegas" to "Completed",
-        "Metro Exodus" to "Want to Play"
-    )
-
     val filteredGames = games.filter {
-        it.first.contains(searchText, ignoreCase = true)
+        it.title.contains(searchText, ignoreCase = true)
     }
 
     Column(
@@ -56,25 +51,43 @@ fun GameLibraryScreen(
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        LazyColumn(
-            verticalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            items(filteredGames) { game ->
-                Card(
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Column(
-                        modifier = Modifier.padding(16.dp)
+        if (filteredGames.isEmpty()) {
+            Text(
+                text = if (searchText.isBlank()) {
+                    "No games saved yet. Add your first game!"
+                } else {
+                    "No games found."
+                }
+            )
+        } else {
+            LazyColumn(
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                items(
+                    items = filteredGames,
+                    key = { it.gameID }
+                ) { game ->
+                    Card(
+                        modifier = Modifier.fillMaxWidth()
                     ) {
-                        Text(
-                            text = game.first,
-                            style = MaterialTheme.typography.titleMedium
-                        )
+                        Column(
+                            modifier = Modifier.padding(16.dp)
+                        ) {
+                            Text(
+                                text = game.title,
+                                style = MaterialTheme.typography.titleMedium
+                            )
 
-                        Text(
-                            text = game.second,
-                            style = MaterialTheme.typography.bodyMedium
-                        )
+                            Text(
+                                text = game.genre + " • " + game.platform,
+                                style = MaterialTheme.typography.bodyMedium
+                            )
+
+                            Text(
+                                text = game.status,
+                                style = MaterialTheme.typography.bodyMedium
+                            )
+                        }
                     }
                 }
             }
