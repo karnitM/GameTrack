@@ -89,7 +89,9 @@ class MainActivity : ComponentActivity() {
                                     currentScreen = "edit"
                                 },
                                 onDelete = {
-                                    // Deletion will be implemented next
+                                    gameViewModel.deleteGame(game)
+                                    selectedGame = null
+                                    currentScreen = "library"
                                 },
                                 onBack = {
                                     selectedGame = null
