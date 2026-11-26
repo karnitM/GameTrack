@@ -1,8 +1,12 @@
 package com.example.gametrack
 
+import android.Manifest
+import android.content.pm.PackageManager
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.content.ContextCompat
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.lifecycle.ViewModel
@@ -11,26 +15,50 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.gametrack.data.AppDatabase
 import com.example.gametrack.data.Game
+import com.example.gametrack.data.Reminder
 import com.example.gametrack.repository.GameRepository
-import com.example.gametrack.screens.AddGameScreen
-import com.example.gametrack.screens.GameDetailsScreen
-import com.example.gametrack.screens.GameLibraryScreen
-import com.example.gametrack.screens.EditGameScreen
-import com.example.gametrack.screens.StatisticsScreen
-import com.example.gametrack.screens.SearchGamesScreen
+import com.example.gametrack.repository.ReminderRepository
+import com.example.gametrack.notifications.ReminderScheduler
+import com.example.gametrack.screens.*
 import com.example.gametrack.ui.theme.GameTrackTheme
 import com.example.gametrack.viewmodel.GameViewModel
+import com.example.gametrack.viewmodel.ReminderViewModel
 
 class MainActivity : ComponentActivity() {
+
+    private val notificationPermissionLauncher =
+        registerForActivityResult(
+            ActivityResultContracts.RequestPermission()
+        ) { }
+
+    private fun requestNotificationPermission() {
+        if (ContextCompat.checkSelfPermission(
+                this,
+                Manifest.permission.POST_NOTIFICATIONS
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
+            notificationPermissionLauncher.launch(
+                Manifest.permission.POST_NOTIFICATIONS
+            )
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         val database = AppDatabase.getDatabase(applicationContext)
+
         val repository = GameRepository(database.gameDao())
+
+        val reminderRepository =
+            ReminderRepository(database.reminderDao())
+
+        val reminderScheduler =
+            ReminderScheduler(applicationContext)
 
         setContent {
             GameTrackTheme {
+
                 val gameViewModel: GameViewModel = viewModel(
                     factory = object : ViewModelProvider.Factory {
                         @Suppress("UNCHECKED_CAST")
@@ -42,7 +70,25 @@ class MainActivity : ComponentActivity() {
                     }
                 )
 
-                val games by gameViewModel.allGames.collectAsStateWithLifecycle()
+                val reminderViewModel: ReminderViewModel = viewModel(
+                    factory = object : ViewModelProvider.Factory {
+                        @Suppress("UNCHECKED_CAST")
+                        override fun <T : ViewModel> create(
+                            modelClass: Class<T>
+                        ): T {
+                            return ReminderViewModel(
+                                reminderRepository,
+                                reminderScheduler
+                            ) as T
+                        }
+                    }
+                )
+
+                val games by gameViewModel.allGames
+                    .collectAsStateWithLifecycle()
+
+                val reminders by reminderViewModel.allReminders
+                    .collectAsStateWithLifecycle()
 
                 var currentScreen by rememberSaveable {
                     mutableStateOf("library")
@@ -52,7 +98,12 @@ class MainActivity : ComponentActivity() {
                     mutableStateOf<Game?>(null)
                 }
 
+                var selectedReminder by remember {
+                    mutableStateOf<Reminder?>(null)
+                }
+
                 when (currentScreen) {
+
                     "library" -> {
                         GameLibraryScreen(
                             games = games,
@@ -68,6 +119,10 @@ class MainActivity : ComponentActivity() {
                             },
                             onSearchGames = {
                                 currentScreen = "search"
+                            },
+                            onReminders = {
+                                currentScreen = "reminders"
+                                requestNotificationPermission()
                             }
                         )
                     }
@@ -134,10 +189,11 @@ class MainActivity : ComponentActivity() {
                         )
                     }
 
-
                     "search" -> {
                         SearchGamesScreen(
-                            onBack = { currentScreen = "library" },
+                            onBack = {
+                                currentScreen = "library"
+                            },
                             onSaveGame = { title, genre, platform, status ->
                                 gameViewModel.addGame(
                                     title,
@@ -147,6 +203,74 @@ class MainActivity : ComponentActivity() {
                                 )
                             }
                         )
+                    }
+
+                    "reminders" -> {
+                        RemindersScreen(
+                            reminders = reminders,
+                            onAddReminder = {
+                                currentScreen = "addReminder"
+                            },
+                            onEditReminder = { reminder ->
+                                selectedReminder = reminder
+                                currentScreen = "editReminder"
+                            },
+                            onDeleteReminder = { reminder ->
+                                reminderViewModel.deleteReminder(reminder)
+                            },
+                            onBack = {
+                                currentScreen = "library"
+                            }
+                        )
+                    }
+
+                    "addReminder" -> {
+                        AddReminderScreen(
+                            onSaveReminder = {
+                                    gameTitle, eventName, reminderTime, repeatType ->
+
+                                reminderViewModel.addReminder(
+                                    gameTitle,
+                                    eventName,
+                                    reminderTime,
+                                    repeatType
+                                )
+
+                                currentScreen = "reminders"
+                            },
+                            onCancel = {
+                                currentScreen = "reminders"
+                            }
+                        )
+                    }
+
+                    "editReminder" -> {
+                        selectedReminder?.let { reminder ->
+                            AddReminderScreen(
+                                reminder = reminder,
+                                onSaveReminder = {
+                                        gameTitle, eventName, reminderTime, repeatType ->
+
+                                    val updatedReminder = reminder.copy(
+                                        gameTitle = gameTitle,
+                                        eventName = eventName,
+                                        reminderTime = reminderTime,
+                                        repeatType = repeatType
+                                    )
+
+                                    reminderViewModel.updateReminder(
+                                        updatedReminder
+                                    )
+
+                                    selectedReminder = null
+                                    currentScreen = "reminders"
+                                },
+                                onCancel = {
+                                    selectedReminder = null
+                                    currentScreen = "reminders"
+                                }
+                            )
+                        }
                     }
                 }
             }

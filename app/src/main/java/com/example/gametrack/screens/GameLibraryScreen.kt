@@ -16,7 +16,8 @@ fun GameLibraryScreen(
     onAddGame: () -> Unit,
     onGameClick: (Game) -> Unit,
     onStatistics: () -> Unit,
-    onSearchGames: () -> Unit
+    onSearchGames: () -> Unit,
+    onReminders: () -> Unit
 ) {
     var searchText by remember { mutableStateOf("") }
 
@@ -71,6 +72,13 @@ fun GameLibraryScreen(
 
         Spacer(modifier = Modifier.height(8.dp))
 
+        OutlinedButton(
+            onClick = onReminders,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text("Game Reminders")
+        }
+
         Spacer(modifier = Modifier.height(16.dp))
 
         if (filteredGames.isEmpty()) {
@@ -83,6 +91,7 @@ fun GameLibraryScreen(
             )
         } else {
             LazyColumn(
+                modifier = Modifier.weight(1f),
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 items(
