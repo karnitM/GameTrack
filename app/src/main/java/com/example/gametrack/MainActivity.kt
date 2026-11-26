@@ -7,6 +7,10 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.ui.Modifier
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.lifecycle.ViewModel
@@ -58,218 +62,225 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             GameTrackTheme {
+                Surface(
+                    modifier = Modifier.fillMaxSize(),
+                    color = MaterialTheme.colorScheme.background,
+                    contentColor = MaterialTheme.colorScheme.onBackground
+                ) {
 
-                val gameViewModel: GameViewModel = viewModel(
-                    factory = object : ViewModelProvider.Factory {
-                        @Suppress("UNCHECKED_CAST")
-                        override fun <T : ViewModel> create(
-                            modelClass: Class<T>
-                        ): T {
-                            return GameViewModel(repository) as T
-                        }
-                    }
-                )
-
-                val reminderViewModel: ReminderViewModel = viewModel(
-                    factory = object : ViewModelProvider.Factory {
-                        @Suppress("UNCHECKED_CAST")
-                        override fun <T : ViewModel> create(
-                            modelClass: Class<T>
-                        ): T {
-                            return ReminderViewModel(
-                                reminderRepository,
-                                reminderScheduler
-                            ) as T
-                        }
-                    }
-                )
-
-                val games by gameViewModel.allGames
-                    .collectAsStateWithLifecycle()
-
-                val reminders by reminderViewModel.allReminders
-                    .collectAsStateWithLifecycle()
-
-                var currentScreen by rememberSaveable {
-                    mutableStateOf("library")
-                }
-
-                var selectedGame by remember {
-                    mutableStateOf<Game?>(null)
-                }
-
-                var selectedReminder by remember {
-                    mutableStateOf<Reminder?>(null)
-                }
-
-                when (currentScreen) {
-
-                    "library" -> {
-                        GameLibraryScreen(
-                            games = games,
-                            onAddGame = {
-                                currentScreen = "add"
-                            },
-                            onGameClick = { game ->
-                                selectedGame = game
-                                currentScreen = "details"
-                            },
-                            onStatistics = {
-                                currentScreen = "statistics"
-                            },
-                            onSearchGames = {
-                                currentScreen = "search"
-                            },
-                            onReminders = {
-                                currentScreen = "reminders"
-                                requestNotificationPermission()
+                    val gameViewModel: GameViewModel = viewModel(
+                        factory = object : ViewModelProvider.Factory {
+                            @Suppress("UNCHECKED_CAST")
+                            override fun <T : ViewModel> create(
+                                modelClass: Class<T>
+                            ): T {
+                                return GameViewModel(repository) as T
                             }
-                        )
-                    }
+                        }
+                    )
 
-                    "add" -> {
-                        AddGameScreen(
-                            onSaveGame = { title, genre, platform, status ->
-                                gameViewModel.addGame(
-                                    title,
-                                    genre,
-                                    platform,
-                                    status
-                                )
-                                currentScreen = "library"
-                            },
-                            onCancel = {
-                                currentScreen = "library"
+                    val reminderViewModel: ReminderViewModel = viewModel(
+                        factory = object : ViewModelProvider.Factory {
+                            @Suppress("UNCHECKED_CAST")
+                            override fun <T : ViewModel> create(
+                                modelClass: Class<T>
+                            ): T {
+                                return ReminderViewModel(
+                                    reminderRepository,
+                                    reminderScheduler
+                                ) as T
                             }
-                        )
+                        }
+                    )
+
+                    val games by gameViewModel.allGames
+                        .collectAsStateWithLifecycle()
+
+                    val reminders by reminderViewModel.allReminders
+                        .collectAsStateWithLifecycle()
+
+                    var currentScreen by rememberSaveable {
+                        mutableStateOf("library")
                     }
 
-                    "details" -> {
-                        selectedGame?.let { game ->
-                            GameDetailsScreen(
-                                game = game,
-                                onEdit = {
-                                    currentScreen = "edit"
+                    var selectedGame by remember {
+                        mutableStateOf<Game?>(null)
+                    }
+
+                    var selectedReminder by remember {
+                        mutableStateOf<Reminder?>(null)
+                    }
+
+                    when (currentScreen) {
+
+                        "library" -> {
+                            GameLibraryScreen(
+                                games = games,
+                                onAddGame = {
+                                    currentScreen = "add"
                                 },
-                                onDelete = {
-                                    gameViewModel.deleteGame(game)
-                                    selectedGame = null
-                                    currentScreen = "library"
+                                onGameClick = { game ->
+                                    selectedGame = game
+                                    currentScreen = "details"
                                 },
-                                onBack = {
-                                    selectedGame = null
-                                    currentScreen = "library"
+                                onStatistics = {
+                                    currentScreen = "statistics"
+                                },
+                                onSearchGames = {
+                                    currentScreen = "search"
+                                },
+                                onReminders = {
+                                    currentScreen = "reminders"
+                                    requestNotificationPermission()
                                 }
                             )
                         }
-                    }
 
-                    "edit" -> {
-                        selectedGame?.let { game ->
-                            EditGameScreen(
-                                game = game,
-                                onSave = { updatedGame ->
-                                    gameViewModel.updateGame(updatedGame)
-                                    selectedGame = updatedGame
-                                    currentScreen = "details"
+                        "add" -> {
+                            AddGameScreen(
+                                onSaveGame = { title, genre, platform, status ->
+                                    gameViewModel.addGame(
+                                        title,
+                                        genre,
+                                        platform,
+                                        status
+                                    )
+
+                                    currentScreen = "library"
                                 },
                                 onCancel = {
-                                    currentScreen = "details"
+                                    currentScreen = "library"
                                 }
                             )
                         }
-                    }
 
-                    "statistics" -> {
-                        StatisticsScreen(
-                            games = games,
-                            onBack = {
-                                currentScreen = "library"
-                            }
-                        )
-                    }
-
-                    "search" -> {
-                        SearchGamesScreen(
-                            onBack = {
-                                currentScreen = "library"
-                            },
-                            onSaveGame = { title, genre, platform, status ->
-                                gameViewModel.addGame(
-                                    title,
-                                    genre,
-                                    platform,
-                                    status
+                        "details" -> {
+                            selectedGame?.let { game ->
+                                GameDetailsScreen(
+                                    game = game,
+                                    onEdit = {
+                                        currentScreen = "edit"
+                                    },
+                                    onDelete = {
+                                        gameViewModel.deleteGame(game)
+                                        selectedGame = null
+                                        currentScreen = "library"
+                                    },
+                                    onBack = {
+                                        selectedGame = null
+                                        currentScreen = "library"
+                                    }
                                 )
                             }
-                        )
-                    }
+                        }
 
-                    "reminders" -> {
-                        RemindersScreen(
-                            reminders = reminders,
-                            onAddReminder = {
-                                currentScreen = "addReminder"
-                            },
-                            onEditReminder = { reminder ->
-                                selectedReminder = reminder
-                                currentScreen = "editReminder"
-                            },
-                            onDeleteReminder = { reminder ->
-                                reminderViewModel.deleteReminder(reminder)
-                            },
-                            onBack = {
-                                currentScreen = "library"
-                            }
-                        )
-                    }
-
-                    "addReminder" -> {
-                        AddReminderScreen(
-                            onSaveReminder = {
-                                    gameTitle, eventName, reminderTime, repeatType ->
-
-                                reminderViewModel.addReminder(
-                                    gameTitle,
-                                    eventName,
-                                    reminderTime,
-                                    repeatType
+                        "edit" -> {
+                            selectedGame?.let { game ->
+                                EditGameScreen(
+                                    game = game,
+                                    onSave = { updatedGame ->
+                                        gameViewModel.updateGame(updatedGame)
+                                        selectedGame = updatedGame
+                                        currentScreen = "details"
+                                    },
+                                    onCancel = {
+                                        currentScreen = "details"
+                                    }
                                 )
-
-                                currentScreen = "reminders"
-                            },
-                            onCancel = {
-                                currentScreen = "reminders"
                             }
-                        )
-                    }
+                        }
 
-                    "editReminder" -> {
-                        selectedReminder?.let { reminder ->
+                        "statistics" -> {
+                            StatisticsScreen(
+                                games = games,
+                                onBack = {
+                                    currentScreen = "library"
+                                }
+                            )
+                        }
+
+                        "search" -> {
+                            SearchGamesScreen(
+                                onBack = {
+                                    currentScreen = "library"
+                                },
+                                onSaveGame = { title, genre, platform, status ->
+                                    gameViewModel.addGame(
+                                        title,
+                                        genre,
+                                        platform,
+                                        status
+                                    )
+                                }
+                            )
+                        }
+
+                        "reminders" -> {
+                            RemindersScreen(
+                                reminders = reminders,
+                                onAddReminder = {
+                                    currentScreen = "addReminder"
+                                },
+                                onEditReminder = { reminder ->
+                                    selectedReminder = reminder
+                                    currentScreen = "editReminder"
+                                },
+                                onDeleteReminder = { reminder ->
+                                    reminderViewModel.deleteReminder(reminder)
+                                },
+                                onBack = {
+                                    currentScreen = "library"
+                                }
+                            )
+                        }
+
+                        "addReminder" -> {
                             AddReminderScreen(
-                                reminder = reminder,
                                 onSaveReminder = {
                                         gameTitle, eventName, reminderTime, repeatType ->
 
-                                    val updatedReminder = reminder.copy(
-                                        gameTitle = gameTitle,
-                                        eventName = eventName,
-                                        reminderTime = reminderTime,
-                                        repeatType = repeatType
+                                    reminderViewModel.addReminder(
+                                        gameTitle,
+                                        eventName,
+                                        reminderTime,
+                                        repeatType
                                     )
 
-                                    reminderViewModel.updateReminder(
-                                        updatedReminder
-                                    )
-
-                                    selectedReminder = null
                                     currentScreen = "reminders"
                                 },
                                 onCancel = {
-                                    selectedReminder = null
                                     currentScreen = "reminders"
                                 }
                             )
+                        }
+
+                        "editReminder" -> {
+                            selectedReminder?.let { reminder ->
+                                AddReminderScreen(
+                                    reminder = reminder,
+                                    onSaveReminder = {
+                                            gameTitle, eventName, reminderTime, repeatType ->
+
+                                        val updatedReminder = reminder.copy(
+                                            gameTitle = gameTitle,
+                                            eventName = eventName,
+                                            reminderTime = reminderTime,
+                                            repeatType = repeatType
+                                        )
+
+                                        reminderViewModel.updateReminder(
+                                            updatedReminder
+                                        )
+
+                                        selectedReminder = null
+                                        currentScreen = "reminders"
+                                    },
+                                    onCancel = {
+                                        selectedReminder = null
+                                        currentScreen = "reminders"
+                                    }
+                                )
+                            }
                         }
                     }
                 }
