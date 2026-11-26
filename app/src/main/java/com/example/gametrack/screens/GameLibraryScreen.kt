@@ -10,6 +10,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.foundation.clickable
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
@@ -73,6 +74,14 @@ fun GameLibraryScreen(
                     .fillMaxWidth()
                     .heightIn(min = 48.dp)
             ) {
+                Icon(
+                    painter = painterResource(R.drawable.ic_add_game),
+                    contentDescription = null,
+                    modifier = Modifier.size(24.dp)
+                )
+
+                Spacer(modifier = Modifier.width(8.dp))
+
                 Text(stringResource(R.string.add_game_manually))
             }
         }
@@ -84,6 +93,14 @@ fun GameLibraryScreen(
                     .fillMaxWidth()
                     .heightIn(min = 48.dp)
             ) {
+                Icon(
+                    painter = painterResource(R.drawable.ic_statistics),
+                    contentDescription = null,
+                    modifier = Modifier.size(24.dp)
+                )
+
+                Spacer(modifier = Modifier.width(8.dp))
+
                 Text(stringResource(R.string.view_statistics))
             }
         }
@@ -95,6 +112,14 @@ fun GameLibraryScreen(
                     .fillMaxWidth()
                     .heightIn(min = 48.dp)
             ) {
+                Icon(
+                    painter = painterResource(R.drawable.ic_search_games),
+                    contentDescription = null,
+                    modifier = Modifier.size(24.dp)
+                )
+
+                Spacer(modifier = Modifier.width(8.dp))
+
                 Text(stringResource(R.string.discover_games_online))
             }
         }
@@ -106,6 +131,14 @@ fun GameLibraryScreen(
                     .fillMaxWidth()
                     .heightIn(min = 48.dp)
             ) {
+                Icon(
+                    painter = painterResource(R.drawable.ic_reminders),
+                    contentDescription = null,
+                    modifier = Modifier.size(24.dp)
+                )
+
+                Spacer(modifier = Modifier.width(8.dp))
+
                 Text(stringResource(R.string.game_reminders))
             }
 
