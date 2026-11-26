@@ -5,6 +5,8 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.res.stringResource
+import com.example.gametrack.R
 import com.example.gametrack.data.Game
 
 @Composable
@@ -30,20 +32,35 @@ fun StatisticsScreen(
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         Text(
-            text = "Game Statistics",
+            text = stringResource(R.string.game_statistics),
             style = MaterialTheme.typography.headlineMedium
         )
 
-        StatisticCard("Total Games", totalGames)
-        StatisticCard("Completed Games", completedGames)
-        StatisticCard("Currently Playing", currentlyPlaying)
-        StatisticCard("Want to Play", wantToPlay)
+        StatisticCard(
+            stringResource(R.string.total_games),
+            totalGames
+        )
+
+        StatisticCard(
+            stringResource(R.string.completed_games),
+            completedGames
+        )
+
+        StatisticCard(
+            stringResource(R.string.status_playing),
+            currentlyPlaying
+        )
+
+        StatisticCard(
+            stringResource(R.string.status_want_to_play),
+            wantToPlay
+        )
 
         OutlinedButton(
             onClick = onBack,
             modifier = Modifier.fillMaxWidth()
         ) {
-            Text("Back to Library")
+            Text(stringResource(R.string.back_to_library))
         }
     }
 }

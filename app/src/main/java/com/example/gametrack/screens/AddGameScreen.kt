@@ -7,6 +7,8 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.res.stringResource
+import com.example.gametrack.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -29,14 +31,14 @@ fun AddGameScreen(
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
         Text(
-            text = "Add New Game",
+            text = stringResource(R.string.add_new_game),
             style = MaterialTheme.typography.headlineMedium
         )
 
         OutlinedTextField(
             value = title,
             onValueChange = { title = it },
-            label = { Text("Game Title") },
+            label = { Text(stringResource(R.string.game_title)) },
             modifier = Modifier.fillMaxWidth(),
             singleLine = true
         )
@@ -44,7 +46,7 @@ fun AddGameScreen(
         OutlinedTextField(
             value = genre,
             onValueChange = { genre = it },
-            label = { Text("Genre") },
+            label = { Text(stringResource(R.string.genre)) },
             modifier = Modifier.fillMaxWidth(),
             singleLine = true
         )
@@ -52,7 +54,7 @@ fun AddGameScreen(
         OutlinedTextField(
             value = platform,
             onValueChange = { platform = it },
-            label = { Text("Platform") },
+            label = { Text(stringResource(R.string.platform)) },
             modifier = Modifier.fillMaxWidth(),
             singleLine = true
         )
@@ -62,10 +64,15 @@ fun AddGameScreen(
             onExpandedChange = { statusExpanded = !statusExpanded }
         ) {
             OutlinedTextField(
-                value = status,
+                value = when (status) {
+                    "Want to Play" -> stringResource(R.string.status_want_to_play)
+                    "Currently Playing" -> stringResource(R.string.status_playing)
+                    "Completed" -> stringResource(R.string.status_completed)
+                    else -> status
+                },
                 onValueChange = {},
                 readOnly = true,
-                label = { Text("Playing Status") },
+                label = { Text(stringResource(R.string.playing_status)) },
                 trailingIcon = {
                     ExposedDropdownMenuDefaults.TrailingIcon(
                         expanded = statusExpanded
@@ -88,7 +95,16 @@ fun AddGameScreen(
                     "Completed"
                 ).forEach { option ->
                     DropdownMenuItem(
-                        text = { Text(option) },
+                        text = {
+                            Text(
+                                when (option) {
+                                    "Want to Play" -> stringResource(R.string.status_want_to_play)
+                                    "Currently Playing" -> stringResource(R.string.status_playing)
+                                    "Completed" -> stringResource(R.string.status_completed)
+                                    else -> option
+                                }
+                            )
+                        },
                         onClick = {
                             status = option
                             statusExpanded = false
@@ -100,7 +116,7 @@ fun AddGameScreen(
 
         if (showError) {
             Text(
-                text = "Please fill in all fields.",
+                text = stringResource(R.string.fill_all_fields),
                 color = MaterialTheme.colorScheme.error
             )
         }
@@ -125,14 +141,14 @@ fun AddGameScreen(
             },
             modifier = Modifier.fillMaxWidth()
         ) {
-            Text("Save Game")
+            Text(stringResource(R.string.save_game))
         }
 
         OutlinedButton(
             onClick = onCancel,
             modifier = Modifier.fillMaxWidth()
         ) {
-            Text("Cancel")
+            Text(stringResource(R.string.cancel))
         }
     }
 }

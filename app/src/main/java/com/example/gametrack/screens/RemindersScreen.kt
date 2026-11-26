@@ -7,6 +7,8 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.res.stringResource
+import com.example.gametrack.R
 import com.example.gametrack.data.Reminder
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -35,7 +37,7 @@ fun RemindersScreen(
             .padding(16.dp)
     ) {
         Text(
-            text = "Game Reminders",
+            text = stringResource(R.string.game_reminders),
             style = MaterialTheme.typography.headlineMedium
         )
 
@@ -45,20 +47,20 @@ fun RemindersScreen(
             onClick = onAddReminder,
             modifier = Modifier.fillMaxWidth()
         ) {
-            Text("Create Reminder")
+            Text(stringResource(R.string.create_reminder))
         }
 
         OutlinedButton(
             onClick = onBack,
             modifier = Modifier.fillMaxWidth()
         ) {
-            Text("Back to Library")
+            Text(stringResource(R.string.back_to_library))
         }
 
         Spacer(modifier = Modifier.height(16.dp))
 
         if (reminders.isEmpty()) {
-            Text("No reminders created yet.")
+            Text(stringResource(R.string.no_reminders))
         }
 
         LazyColumn(
@@ -81,14 +83,27 @@ fun RemindersScreen(
                         Text(reminder.eventName)
 
                         Text(
-                            "Scheduled: ${
+                            stringResource(
+                                R.string.scheduled_details,
                                 dateFormat.format(
                                     Date(reminder.reminderTime)
                                 )
-                            }"
+                            )
                         )
 
-                        Text("Repeat: ${reminder.repeatType}")
+                        val translatedRepeat = when (reminder.repeatType) {
+                            "Never" -> stringResource(R.string.repeat_never)
+                            "Daily" -> stringResource(R.string.repeat_daily)
+                            "Weekly" -> stringResource(R.string.repeat_weekly)
+                            else -> reminder.repeatType
+                        }
+
+                        Text(
+                            stringResource(
+                                R.string.repeat_details,
+                                translatedRepeat
+                            )
+                        )
 
                         Spacer(modifier = Modifier.height(8.dp))
 
@@ -101,7 +116,7 @@ fun RemindersScreen(
                                     onEditReminder(reminder)
                                 }
                             ) {
-                                Text("Edit")
+                                Text(stringResource(R.string.edit))
                             }
 
                             OutlinedButton(
@@ -109,7 +124,7 @@ fun RemindersScreen(
                                     reminderToDelete = reminder
                                 }
                             ) {
-                                Text("Delete")
+                                Text(stringResource(R.string.delete))
                             }
                         }
                     }
@@ -124,10 +139,10 @@ fun RemindersScreen(
                 reminderToDelete = null
             },
             title = {
-                Text("Delete Reminder")
+                Text(stringResource(R.string.delete_reminder))
             },
             text = {
-                Text("Are you sure you want to delete this reminder?")
+                Text(stringResource(R.string.delete_reminder_message))
             },
             confirmButton = {
                 TextButton(
@@ -136,7 +151,7 @@ fun RemindersScreen(
                         reminderToDelete = null
                     }
                 ) {
-                    Text("Delete")
+                    Text(stringResource(R.string.delete))
                 }
             },
             dismissButton = {
@@ -145,7 +160,7 @@ fun RemindersScreen(
                         reminderToDelete = null
                     }
                 ) {
-                    Text("Cancel")
+                    Text(stringResource(R.string.cancel))
                 }
             }
         )

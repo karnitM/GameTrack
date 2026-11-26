@@ -1,4 +1,3 @@
-
 package com.example.gametrack.screens
 
 import androidx.compose.foundation.layout.*
@@ -8,6 +7,8 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.res.stringResource
+import com.example.gametrack.R
 import com.example.gametrack.BuildConfig
 import com.example.gametrack.network.RawgGame
 import com.example.gametrack.network.RetrofitClient
@@ -23,7 +24,6 @@ fun SearchGamesScreen(
     onBack: () -> Unit,
     onSaveGame: (String, String, String, String) -> Unit
 ) {
-
     var searchQuery by remember { mutableStateOf("") }
     var games by remember { mutableStateOf<List<RawgGame>>(emptyList()) }
     var isLoading by remember { mutableStateOf(false) }
@@ -33,17 +33,21 @@ fun SearchGamesScreen(
 
     val scope = rememberCoroutineScope()
 
+    val noGamesMessage = stringResource(R.string.no_games_found)
+    val loadErrorMessage = stringResource(R.string.unable_to_load_games)
+    val unknownLabel = stringResource(R.string.unknown)
+
     selectedGame?.let { game ->
         AlertDialog(
             onDismissRequest = {
                 selectedGame = null
             },
             title = {
-                Text("Add ${game.name}")
+                Text(stringResource(R.string.add_game_dialog, game.name))
             },
             text = {
                 Column {
-                    Text("Select your game status:")
+                    Text(stringResource(R.string.select_game_status))
 
                     val statuses = listOf(
                         "Want to Play",
@@ -62,7 +66,14 @@ fun SearchGamesScreen(
                                 }
                             )
 
-                            Text(status)
+                            Text(
+                                when (status) {
+                                    "Want to Play" -> stringResource(R.string.status_want_to_play)
+                                    "Currently Playing" -> stringResource(R.string.status_playing)
+                                    "Completed" -> stringResource(R.string.status_completed)
+                                    else -> status
+                                }
+                            )
                         }
                     }
                 }
@@ -91,7 +102,7 @@ fun SearchGamesScreen(
                         onBack()
                     }
                 ) {
-                    Text("Save Game")
+                    Text(stringResource(R.string.save_game))
                 }
             },
             dismissButton = {
@@ -100,7 +111,7 @@ fun SearchGamesScreen(
                         selectedGame = null
                     }
                 ) {
-                    Text("Cancel")
+                    Text(stringResource(R.string.cancel))
                 }
             }
         )
@@ -112,7 +123,7 @@ fun SearchGamesScreen(
             .padding(16.dp)
     ) {
         Text(
-            text = "Search Online Games",
+            text = stringResource(R.string.search_online_games),
             style = MaterialTheme.typography.headlineMedium
         )
 
@@ -121,7 +132,9 @@ fun SearchGamesScreen(
         OutlinedTextField(
             value = searchQuery,
             onValueChange = { searchQuery = it },
-            label = { Text("Enter game title") },
+            label = {
+                Text(stringResource(R.string.enter_game_title))
+            },
             modifier = Modifier.fillMaxWidth(),
             singleLine = true
         )
@@ -144,13 +157,13 @@ fun SearchGamesScreen(
                         games = response.results
 
                         if (games.isEmpty()) {
-                            errorMessage = "No games found."
+                            errorMessage = noGamesMessage
                         }
 
                     } catch (e: CancellationException) {
                         throw e
                     } catch (e: Exception) {
-                        errorMessage = "Unable to load games. Please try again."
+                        errorMessage = loadErrorMessage
                     } finally {
                         isLoading = false
                     }
@@ -159,14 +172,14 @@ fun SearchGamesScreen(
             enabled = searchQuery.isNotBlank() && !isLoading,
             modifier = Modifier.fillMaxWidth()
         ) {
-            Text("Search")
+            Text(stringResource(R.string.search))
         }
 
         OutlinedButton(
             onClick = onBack,
             modifier = Modifier.fillMaxWidth()
         ) {
-            Text("Back to Library")
+            Text(stringResource(R.string.back_to_library))
         }
 
         Spacer(modifier = Modifier.height(16.dp))
@@ -195,7 +208,10 @@ fun SearchGamesScreen(
                     ) {
                         AsyncImage(
                             model = game.background_image,
-                            contentDescription = "Cover image of ${game.name}",
+                            contentDescription = stringResource(
+                                R.string.game_cover_image,
+                                game.name
+                            ),
                             contentScale = ContentScale.Crop,
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -211,16 +227,30 @@ fun SearchGamesScreen(
                         )
 
                         Text(
-                            text = "Released: ${game.released ?: "Unknown"}"
+                            text = stringResource(
+                                R.string.released_details,
+                                game.released ?: unknownLabel
+                            )
                         )
 
                         Text(
-                            text = "Genres: ${game.genres?.joinToString(", ") { it.name }?.ifBlank { "Unknown" } ?: "Unknown"}"
+                            text = stringResource(
+                                R.string.genres_details,
+                                game.genres
+                                    ?.joinToString(", ") { it.name }
+                                    ?.ifBlank { unknownLabel }
+                                    ?: unknownLabel
+                            )
                         )
 
-
                         Text(
-                            text = "Platforms: ${game.platforms?.joinToString(", ") { it.platform.name }?.ifBlank { "Unknown" } ?: "Unknown"}"
+                            text = stringResource(
+                                R.string.platforms_details,
+                                game.platforms
+                                    ?.joinToString(", ") { it.platform.name }
+                                    ?.ifBlank { unknownLabel }
+                                    ?: unknownLabel
+                            )
                         )
 
                         Spacer(modifier = Modifier.height(8.dp))
@@ -232,9 +262,8 @@ fun SearchGamesScreen(
                             },
                             modifier = Modifier.fillMaxWidth()
                         ) {
-                            Text("Add to Library")
+                            Text(stringResource(R.string.add_to_library))
                         }
-
                     }
                 }
             }

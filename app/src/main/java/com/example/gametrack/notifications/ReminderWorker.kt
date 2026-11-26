@@ -10,6 +10,7 @@ import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
 import androidx.work.Worker
 import androidx.work.WorkerParameters
+import com.example.gametrack.R
 
 class ReminderWorker(
     context: Context,
@@ -28,7 +29,7 @@ class ReminderWorker(
 
         val channel = NotificationChannel(
             "game_reminders",
-            "Game Reminders",
+            applicationContext.getString(R.string.game_reminders),
             NotificationManager.IMPORTANCE_HIGH
         )
 

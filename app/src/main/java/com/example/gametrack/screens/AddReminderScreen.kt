@@ -10,7 +10,9 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.example.gametrack.R
 import com.example.gametrack.data.Reminder
 import java.util.Calendar
 import java.text.SimpleDateFormat
@@ -47,6 +49,10 @@ fun AddReminderScreen(
         )
     }
 
+    val gameNameError = stringResource(R.string.enter_game_name)
+    val eventNameError = stringResource(R.string.enter_event_name)
+    val futureDateError = stringResource(R.string.select_future_date)
+
     val calendar = Calendar.getInstance().apply {
         timeInMillis = reminderTime
     }
@@ -69,9 +75,9 @@ fun AddReminderScreen(
     ) {
         Text(
             text = if (reminder == null) {
-                "Create Reminder"
+                stringResource(R.string.create_reminder)
             } else {
-                "Edit Reminder"
+                stringResource(R.string.edit_reminder)
             },
             style = MaterialTheme.typography.headlineMedium
         )
@@ -81,7 +87,9 @@ fun AddReminderScreen(
         OutlinedTextField(
             value = gameTitle,
             onValueChange = { gameTitle = it },
-            label = { Text("Game Name") },
+            label = {
+                Text(stringResource(R.string.game_name))
+            },
             modifier = Modifier.fillMaxWidth(),
             singleLine = true
         )
@@ -91,7 +99,9 @@ fun AddReminderScreen(
         OutlinedTextField(
             value = eventName,
             onValueChange = { eventName = it },
-            label = { Text("Event or Reward") },
+            label = {
+                Text(stringResource(R.string.event_or_reward))
+            },
             modifier = Modifier.fillMaxWidth()
         )
 
@@ -114,7 +124,12 @@ fun AddReminderScreen(
             },
             modifier = Modifier.fillMaxWidth()
         ) {
-            Text("Date: ${dateFormat.format(calendar.time)}")
+            Text(
+                stringResource(
+                    R.string.date_details,
+                    dateFormat.format(calendar.time)
+                )
+            )
         }
 
         OutlinedButton(
@@ -136,13 +151,18 @@ fun AddReminderScreen(
             },
             modifier = Modifier.fillMaxWidth()
         ) {
-            Text("Time: ${timeFormat.format(calendar.time)}")
+            Text(
+                stringResource(
+                    R.string.time_details,
+                    timeFormat.format(calendar.time)
+                )
+            )
         }
 
         Spacer(modifier = Modifier.height(16.dp))
 
         Text(
-            text = "Repeat Reminder",
+            text = stringResource(R.string.repeat_reminder),
             style = MaterialTheme.typography.titleMedium
         )
 
@@ -155,7 +175,14 @@ fun AddReminderScreen(
                     onClick = { repeatType = option }
                 )
 
-                Text(option)
+                Text(
+                    when (option) {
+                        "Never" -> stringResource(R.string.repeat_never)
+                        "Daily" -> stringResource(R.string.repeat_daily)
+                        "Weekly" -> stringResource(R.string.repeat_weekly)
+                        else -> option
+                    }
+                )
             }
         }
 
@@ -172,15 +199,15 @@ fun AddReminderScreen(
             onClick = {
                 when {
                     gameTitle.isBlank() -> {
-                        errorMessage = "Enter a game name."
+                        errorMessage = gameNameError
                     }
 
                     eventName.isBlank() -> {
-                        errorMessage = "Enter an event or reward."
+                        errorMessage = eventNameError
                     }
 
                     reminderTime <= System.currentTimeMillis() -> {
-                        errorMessage = "Select a future date and time."
+                        errorMessage = futureDateError
                     }
 
                     else -> {
@@ -197,9 +224,9 @@ fun AddReminderScreen(
         ) {
             Text(
                 if (reminder == null) {
-                    "Save Reminder"
+                    stringResource(R.string.save_reminder)
                 } else {
-                    "Update Reminder"
+                    stringResource(R.string.update_reminder)
                 }
             )
         }
@@ -208,7 +235,7 @@ fun AddReminderScreen(
             onClick = onCancel,
             modifier = Modifier.fillMaxWidth()
         ) {
-            Text("Cancel")
+            Text(stringResource(R.string.cancel))
         }
     }
 }

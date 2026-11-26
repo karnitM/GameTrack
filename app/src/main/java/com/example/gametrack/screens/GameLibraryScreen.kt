@@ -9,6 +9,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.example.gametrack.data.Game
 import androidx.compose.foundation.clickable
+import androidx.compose.ui.res.stringResource
+import com.example.gametrack.R
 
 @Composable
 fun GameLibraryScreen(
@@ -31,7 +33,7 @@ fun GameLibraryScreen(
             .padding(16.dp)
     ) {
         Text(
-            text = "My Game Library",
+            text = stringResource(R.string.my_game_library),
             style = MaterialTheme.typography.headlineMedium
         )
 
@@ -40,7 +42,7 @@ fun GameLibraryScreen(
         OutlinedTextField(
             value = searchText,
             onValueChange = { searchText = it },
-            label = { Text("Search my library") },
+            label = { Text(stringResource(R.string.search_my_library)) },
             modifier = Modifier.fillMaxWidth(),
             singleLine = true
         )
@@ -51,7 +53,7 @@ fun GameLibraryScreen(
             onClick = onAddGame,
             modifier = Modifier.fillMaxWidth()
         ) {
-            Text("Add Game Manually")
+            Text(stringResource(R.string.add_game_manually))
         }
 
         Spacer(modifier = Modifier.height(8.dp))
@@ -60,14 +62,14 @@ fun GameLibraryScreen(
             onClick = onStatistics,
             modifier = Modifier.fillMaxWidth()
         ) {
-            Text("View Statistics")
+            Text(stringResource(R.string.view_statistics))
         }
 
         Button(
             onClick = onSearchGames,
             modifier = Modifier.fillMaxWidth()
         ) {
-            Text("Discover Games Online")
+            Text(stringResource(R.string.discover_games_online))
         }
 
         Spacer(modifier = Modifier.height(8.dp))
@@ -76,7 +78,7 @@ fun GameLibraryScreen(
             onClick = onReminders,
             modifier = Modifier.fillMaxWidth()
         ) {
-            Text("Game Reminders")
+            Text(stringResource(R.string.game_reminders))
         }
 
         Spacer(modifier = Modifier.height(16.dp))
@@ -84,9 +86,9 @@ fun GameLibraryScreen(
         if (filteredGames.isEmpty()) {
             Text(
                 text = if (searchText.isBlank()) {
-                    "No games saved yet. Add your first game!"
+                    stringResource(R.string.no_games_saved)
                 } else {
-                    "No games found."
+                    stringResource(R.string.no_games_found)
                 }
             )
         } else {
@@ -119,7 +121,12 @@ fun GameLibraryScreen(
                             )
 
                             Text(
-                                text = game.status,
+                                text = when (game.status) {
+                                    "Want to Play" -> stringResource(R.string.status_want_to_play)
+                                    "Currently Playing" -> stringResource(R.string.status_playing)
+                                    "Completed" -> stringResource(R.string.status_completed)
+                                    else -> game.status
+                                },
                                 style = MaterialTheme.typography.bodyMedium
                             )
                         }
