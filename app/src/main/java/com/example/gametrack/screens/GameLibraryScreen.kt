@@ -15,7 +15,8 @@ fun GameLibraryScreen(
     games: List<Game>,
     onAddGame: () -> Unit,
     onGameClick: (Game) -> Unit,
-    onStatistics: () -> Unit
+    onStatistics: () -> Unit,
+    onSearchGames: () -> Unit
 ) {
     var searchText by remember { mutableStateOf("") }
 
@@ -38,7 +39,7 @@ fun GameLibraryScreen(
         OutlinedTextField(
             value = searchText,
             onValueChange = { searchText = it },
-            label = { Text("Search games") },
+            label = { Text("Search my library") },
             modifier = Modifier.fillMaxWidth(),
             singleLine = true
         )
@@ -49,7 +50,7 @@ fun GameLibraryScreen(
             onClick = onAddGame,
             modifier = Modifier.fillMaxWidth()
         ) {
-            Text("Add Game")
+            Text("Add Game Manually")
         }
 
         Spacer(modifier = Modifier.height(8.dp))
@@ -61,6 +62,14 @@ fun GameLibraryScreen(
             Text("View Statistics")
         }
 
+        Button(
+            onClick = onSearchGames,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text("Discover Games Online")
+        }
+
+        Spacer(modifier = Modifier.height(8.dp))
 
         Spacer(modifier = Modifier.height(16.dp))
 

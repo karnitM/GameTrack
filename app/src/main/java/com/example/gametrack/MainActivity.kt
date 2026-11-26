@@ -15,10 +15,11 @@ import com.example.gametrack.repository.GameRepository
 import com.example.gametrack.screens.AddGameScreen
 import com.example.gametrack.screens.GameDetailsScreen
 import com.example.gametrack.screens.GameLibraryScreen
-import com.example.gametrack.ui.theme.GameTrackTheme
-import com.example.gametrack.viewmodel.GameViewModel
 import com.example.gametrack.screens.EditGameScreen
 import com.example.gametrack.screens.StatisticsScreen
+import com.example.gametrack.screens.SearchGamesScreen
+import com.example.gametrack.ui.theme.GameTrackTheme
+import com.example.gametrack.viewmodel.GameViewModel
 
 class MainActivity : ComponentActivity() {
 
@@ -64,6 +65,9 @@ class MainActivity : ComponentActivity() {
                             },
                             onStatistics = {
                                 currentScreen = "statistics"
+                            },
+                            onSearchGames = {
+                                currentScreen = "search"
                             }
                         )
                     }
@@ -120,11 +124,27 @@ class MainActivity : ComponentActivity() {
                             )
                         }
                     }
+
                     "statistics" -> {
                         StatisticsScreen(
                             games = games,
                             onBack = {
                                 currentScreen = "library"
+                            }
+                        )
+                    }
+
+
+                    "search" -> {
+                        SearchGamesScreen(
+                            onBack = { currentScreen = "library" },
+                            onSaveGame = { title, genre, platform, status ->
+                                gameViewModel.addGame(
+                                    title,
+                                    genre,
+                                    platform,
+                                    status
+                                )
                             }
                         )
                     }

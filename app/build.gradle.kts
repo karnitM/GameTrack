@@ -1,8 +1,22 @@
+import java.util.Properties
+import java.io.FileInputStream
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.ksp)
 }
+
+val localProperties = Properties()
+val localPropertiesFile = rootProject.file("local.properties")
+
+if (localPropertiesFile.exists()) {
+    FileInputStream(localPropertiesFile).use {
+        localProperties.load(it)
+    }
+}
+
+val rawgApiKey = localProperties.getProperty("RAWG_API_KEY", "")
 
 android {
     namespace = "com.example.gametrack"
@@ -21,6 +35,12 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        buildConfigField(
+            "String",
+            "RAWG_API_KEY",
+            "\"$rawgApiKey\""
+        )
     }
 
     buildTypes {
@@ -38,6 +58,7 @@ android {
 
     buildFeatures {
         compose = true
+        buildConfig = true
     }
 }
 
@@ -50,6 +71,9 @@ dependencies {
     implementation(libs.androidx.compose.ui.tooling.preview)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
+
+    // Game cover images
+    implementation("io.coil-kt:coil-compose:2.7.0")
 
     // Room database
     implementation(libs.androidx.room.runtime)
@@ -67,4 +91,8 @@ dependencies {
     debugImplementation(libs.androidx.compose.ui.test.manifest)
     debugImplementation(libs.androidx.compose.ui.tooling)
     implementation(libs.androidx.lifecycle.runtime.compose)
+
+    // RAWG API networking
+    implementation("com.squareup.retrofit2:retrofit:2.11.0")
+    implementation("com.squareup.retrofit2:converter-gson:2.11.0")
 }
